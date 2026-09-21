@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Jevkenpo — Painel privado</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/stats.css" />
+    <script type="module" src="/stats.js"></script>
+  </head>
+  <body>
+    <main class="stats-page">
+      <a class="wordmark" href="/">jevkenpo<span class="brand-dot">.</span></a>
+      <p class="stats-label">PAINEL PRIVADO</p>
+      <h1>Como anda o jogo?</h1>
+      <form id="stats-login">
+        <label for="access-key">Sua chave de acesso</label>
+        <div class="stats-login-row">
+          <input id="access-key" type="password" autocomplete="current-password" required />
+          <button class="play-again" type="submit">Ver números</button>
+        </div>
+      </form>
+      <p id="stats-status" role="status" aria-live="polite"></p>
+      <section id="stats-results" aria-label="Métricas" hidden>
+        <div class="stats-cards">
+          <article><h2>Visitantes</h2><strong id="visitors">—</strong><p>Navegadores que abriram o jogo</p></article>
+          <article><h2>Jogadores</h2><strong id="players">—</strong><p>Enviaram uma resposta julgada</p></article>
+          <article><h2>Conversão</h2><strong id="conversion">—</strong><p>Visitantes que chegaram a jogar</p></article>
+        </div>
+        <p id="stats-period"></p>
+        <p class="stats-note">Contagem aproximada de pessoas: cada navegador conta uma vez. Trocar de dispositivo, limpar os dados ou usar uma janela anônima pode contar novamente. A contagem começa na ativação, sem recuperar acessos anteriores.</p>
+        <div class="stats-actions"><button class="text-button" id="refresh">Atualizar</button><button class="text-button" id="logout">Sair</button></div>
+      </section>
+    </main>
+  </body>
+</html>

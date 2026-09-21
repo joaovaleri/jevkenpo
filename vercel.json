@@ -4,7 +4,8 @@
   "buildCommand": "npm run check",
   "outputDirectory": "public",
   "functions": {
-    "api/index.js": { "maxDuration": 20 }
+    "api/index.js": { "maxDuration": 20 },
+    "api/metrics.js": { "maxDuration": 15 }
   },
   "rewrites": [
     { "source": "/api/game", "destination": "/api/index?action=game" },

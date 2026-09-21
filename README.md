@@ -8,7 +8,7 @@ A deliberately minimal browser game. Start with paper, name anything that beats 
 and let TypeSafe's Jev judge. Every accepted answer becomes the next challenge.
 
 Open source under the [MIT license](LICENSE). Plain HTML/CSS/JavaScript, a tiny
-Node.js API, and no runtime packages or database.
+Node.js API, and optional private metrics backed by Vercel Blob.
 
 ## Deploy on Vercel
 
@@ -52,10 +52,11 @@ environment variable. The command below runs the standalone Node.js server.
 
 ## Run
 
-Node.js 22; no packages to install.
+Node.js 22.
 
 ```sh
 cp .env.example .env.local
+npm install
 # Set TYPESAFE_API_KEY, or use the OpenRouter configuration above.
 npm start
 ```
@@ -63,6 +64,38 @@ npm start
 Open http://127.0.0.1:5180. `npm run dev` restarts the server when source files change.
 The API key stays on the server. Without it, the page opens and explicitly reports
 that Jev is not connected; no fake or hard-coded judgments are substituted.
+
+## Private metrics
+
+The hosted game counts anonymous browsers that visited and browsers that submitted
+at least one answer judged as a win or loss. Each browser counts once across reloads
+and rounds, using a random identifier in local storage. These are approximate people
+counts: other devices, private windows, and clearing browser data can count again.
+Tracking starts when enabled; it does not reconstruct earlier traffic.
+
+To enable metrics on another deployment:
+
+1. Connect a **private** Vercel Blob store to the production project.
+2. Set `METRICS_ADMIN_KEY` to a securely generated random secret (at least 32 bytes).
+   Keep it server-side, outside Git. Set `METRICS_STARTED_AT` to the activation date
+   in ISO 8601 format. Keep this key stable: it also derives anonymous object names.
+3. Redeploy and open `/stats.html`. Enter the secret to see the private dashboard.
+
+The dashboard shell contains no counts. Its API checks the key on every read,
+returns `Cache-Control: no-store`, and keeps the entered key only in page memory.
+Blob records contain only event types and opaque HMAC identifiers, never guesses,
+names, emails, or IP addresses. A player event requires a valid signed game save
+with a judged win/loss. Local scripts, blocked requests, and storage failures can
+under-count; metrics errors never block play. This is analytics, not an audited
+anti-fraud counter. The public game contains no dashboard link or visible counter.
+
+Vercel Hobby currently includes 2,000 Blob advanced operations and 10,000 simple
+operations monthly, shared by the account. A new visitor normally needs one write
+and their first judged answer another; dashboard reads and retries also consume
+operations. Repeated visits/rounds avoid writes. These limits can pause metrics,
+so the dashboard may under-count after the allowance is exhausted. No paid plan or
+automatic upgrade is enabled. See [Blob pricing](https://vercel.com/docs/vercel-blob/usage-and-pricing).
+The standalone Node server serves the game only; use `vercel dev` to test metrics.
 
 ## Rules and behavior
 

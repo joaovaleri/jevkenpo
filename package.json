@@ -4,12 +4,20 @@
   "private": true,
   "type": "module",
   "license": "MIT",
-  "repository": { "type": "git", "url": "https://github.com/joaovaleri/jevkenpo.git" },
-  "engines": { "node": "22.x" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joaovaleri/jevkenpo.git"
+  },
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "node --watch --env-file-if-exists=.env.local server.mjs",
     "start": "node --env-file-if-exists=.env.local server.mjs",
     "test": "node --test tests/*.test.mjs",
-    "check": "node --check lib/judge.mjs && node --check lib/judge-cache.mjs && node --check lib/cloud-game.mjs && node --check api/index.js && node --check public/app.js"
+    "check": "node --check lib/judge.mjs && node --check lib/judge-cache.mjs && node --check lib/cloud-game.mjs && node --check lib/metrics.mjs && node --check api/index.js && node --check api/metrics.js && node --check public/app.js && node --check public/metrics.js && node --check public/stats.js"
+  },
+  "dependencies": {
+    "@vercel/blob": "^2.8.0"
   }
 }

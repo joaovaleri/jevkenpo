@@ -1,3 +1,5 @@
+import { recordMetric } from './metrics.js';
+
 const $ = id => document.getElementById(id);
 const ui = Object.fromEntries(['best', 'round', 'emoji', 'hero-object', 'object-name', 'current-name', 'tagline', 'guess-form', 'guess', 'submit', 'input-hint', 'feedback', 'end-actions', 'journey', 'chain-count', 'chain', 'share', 'restart', 'retry-connection'].map(id => [id, $(id)]));
 let game;
@@ -141,12 +143,14 @@ ui['guess-form'].addEventListener('submit', async event => {
     if (next.result.verdict === 'win') ui.guess.value = '';
     render(next.result.verdict === 'win');
     describeResult(next.result);
+    if (['win', 'lose'].includes(next.result.verdict)) void recordMetric('played', next.token);
   } catch (error) {
     // A lost response may have reached the server. Reconcile before allowing another move.
     try { game = await api('/api/game'); render(); } catch { /* Reconnection is offered below. */ }
     if (game?.last?.guess === guess && ['win', 'lose'].includes(game.last.verdict)) {
       if (game.last.verdict === 'win') ui.guess.value = '';
       describeResult(game.last);
+      void recordMetric('played', game.token);
     } else feedback(error.name === 'TimeoutError' ? 'That took too long. Try again; your run is safe.' : error.message, 'error');
   } finally {
     setBusy(false);
@@ -201,3 +205,4 @@ ui.share.addEventListener('click', async () => {
 
 window.addEventListener('pageshow', event => { if (event.persisted) connect(); });
 connect();
+void recordMetric('visit');

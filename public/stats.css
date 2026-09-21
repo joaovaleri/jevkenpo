@@ -1,0 +1,18 @@
+.stats-page { display: block; width: min(900px, calc(100% - 48px)); margin: 60px auto; }
+.stats-label { margin: 54px 0 15px; color: #888; font-size: 10px; letter-spacing: 2px; }
+.stats-page h1 { text-wrap: initial; }
+#stats-login { margin-top: 36px; max-width: 580px; }
+#stats-login label { display: block; margin-bottom: 10px; color: #666; font-size: 13px; }
+.stats-login-row { display: flex; gap: 12px; }
+.stats-login-row input { border: 1px solid #ddd; border-radius: 10px; min-width: 0; flex: 1; padding: 14px; }
+.stats-login-row input:focus-visible { outline: 2px solid #777; outline-offset: 3px; }
+#stats-status { font-size: 13px; color: #777; min-height: 22px; margin: 25px 0; }
+.stats-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.stats-cards article { padding: 25px; border: 1px solid #eaeaea; border-radius: 16px; }
+.stats-cards h2 { margin: 0 0 20px; font-size: 13px; font-weight: 500; color: #777; }
+.stats-cards strong { font-size: 38px; font-weight: 600; letter-spacing: -1px; }
+.stats-cards p, #stats-period, .stats-note { font-size: 12px; line-height: 1.7; color: #888; }
+#stats-period { margin-top: 26px; }
+.stats-note { max-width: 650px; }
+.stats-actions { display: flex; gap: 30px; margin-top: 25px; }
+@media (max-width: 600px) { .stats-page { margin-top: 35px; } .stats-cards { grid-template-columns: 1fr; } .stats-login-row { flex-direction: column; } }
