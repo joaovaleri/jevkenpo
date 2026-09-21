@@ -18,6 +18,8 @@ a { color: inherit; }
 .wordmark { text-decoration: none; font-size: 25px; font-weight: 760; letter-spacing: -1.35px; }
 .brand-dot { color: #a5a5a5; }
 .header-right { display: flex; align-items: center; gap: 27px; }
+.header-actions { display: flex; align-items: center; gap: 8px; }
+.repo-link { text-decoration: none; flex-shrink: 0; }
 .best { color: #797979; font-size: 12px; }
 .best strong { color: #333; font-weight: 600; font-variant-numeric: tabular-nums; margin-left: 10px; }
 .icon-button { background: none; border: 1px solid #e8e8e8; width: 29px; height: 29px; border-radius: 50%; display: grid; place-items: center; color: #777; font-size: 13px; transition: background .18s; }
