@@ -1,0 +1,22 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "npm run check",
+  "outputDirectory": "public",
+  "functions": {
+    "api/index.js": { "maxDuration": 20 }
+  },
+  "rewrites": [
+    { "source": "/api/game", "destination": "/api/index?action=game" },
+    { "source": "/api/guess", "destination": "/api/index?action=guess" },
+    { "source": "/api/new", "destination": "/api/index?action=new" }
+  ],
+  "headers": [{
+    "source": "/(.*)",
+    "headers": [
+      { "key": "X-Content-Type-Options", "value": "nosniff" },
+      { "key": "Referrer-Policy", "value": "same-origin" },
+      { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'" }
+    ]
+  }]
+}

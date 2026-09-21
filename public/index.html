@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="description" content="Rock, paper, scissors. And literally anything else. How far can your imagination go? Jev decides." />
+    <title>Jevkenpo — What beats this?</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/style.css" />
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="wordmark" href="/" aria-label="Jevkenpo home">jevkenpo<span class="brand-dot">.</span></a>
+      <div class="header-right">
+        <span class="best">Personal best <strong id="best">0</strong></span>
+        <button class="icon-button help-button" id="help" aria-label="How to play" title="How to play">?</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="game" aria-labelledby="question">
+        <div class="round-label"><span class="round-dot"></span><span id="round">THE POSSIBILITIES ARE ENDLESS</span></div>
+        <div class="hero-object" id="hero-object"><span class="hero-emoji" id="emoji" role="img" aria-label="paper">📄</span></div>
+        <p class="object-name" id="object-name">PAPER</p>
+        <h1 id="question">What beats <span id="current-name">paper</span>?</h1>
+        <p class="tagline" id="tagline">Rock, paper, scissors. And literally anything else.</p>
+
+        <form id="guess-form" class="guess-form" autocomplete="off">
+          <label class="sr-only" for="guess">Your answer</label>
+          <input id="guess" name="guess" type="text" maxlength="80" placeholder="A black hole, maybe?" enterkeyhint="go" autocapitalize="off" spellcheck="false" aria-describedby="feedback input-hint" disabled />
+          <button class="submit-button" id="submit" type="submit" aria-label="Submit answer" disabled>
+            <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="spinner" aria-hidden="true"></span>
+          </button>
+        </form>
+        <div class="input-hint" id="input-hint"><span>Anything goes. Make it count.</span><span class="enter-hint">press <kbd>enter ↵</kbd></span></div>
+        <p id="feedback" class="feedback" role="status" aria-live="polite">Connecting to Jev…</p>
+        <button class="retry-connection" id="retry-connection" hidden>Try connecting again ↻</button>
+
+        <div class="end-actions" id="end-actions" hidden>
+          <button class="play-again" id="play-again">Play again <span aria-hidden="true">↗</span></button>
+        </div>
+
+        <section class="journey" id="journey" aria-label="Your sequence" hidden>
+          <div class="journey-heading"><span>YOUR CHAIN <span id="chain-count">01</span></span><button class="text-button" id="share">Share run <span aria-hidden="true">↗</span></button></div>
+          <ol id="chain" class="chain"></ol>
+          <button class="text-button start-over" id="restart">Start over <span aria-hidden="true">↻</span></button>
+        </section>
+      </section>
+    </main>
+
+    <footer class="site-footer"><span>A little logic. A lot of imagination.</span><span class="powered">Judged by <a href="https://typesafe.ai/" target="_blank" rel="noreferrer">Jev <span aria-hidden="true">↗</span></a></span></footer>
+
+    <dialog id="rules" aria-labelledby="rules-title">
+      <button class="icon-button close-dialog" id="close-rules" aria-label="Close instructions">×</button>
+      <div class="rules-emoji" aria-hidden="true">🪨 📄 ✂️</div>
+      <h2 id="rules-title">Three was never enough.</h2>
+      <p>Start with paper. Name anything that beats it. If Jev agrees, your answer becomes the next thing to beat.</p>
+      <ol><li>Objects, ideas, imaginary things. Go wild.</li><li>Every answer must be new. No repeats.</li><li>If Jev says no, your run ends.</li></ol>
+      <p class="rules-note">A playful judgment, not a law of physics. Your answers are sent to Jev to judge the matchup.</p>
+      <button class="play-again" id="got-it">Let’s play <span aria-hidden="true">↗</span></button>
+    </dialog>
+    <dialog id="restart-dialog" aria-labelledby="restart-title">
+      <button class="icon-button close-dialog" id="close-restart" aria-label="Keep playing">×</button>
+      <h2 id="restart-title">A fresh start?</h2>
+      <p>Your chain will be cleared. Your personal best stays.</p>
+      <button class="play-again" id="confirm-restart">Start over <span aria-hidden="true">↻</span></button>
+      <button class="text-button keep-playing" id="keep-playing">Keep playing</button>
+    </dialog>
+    <noscript><p class="noscript">Turn on JavaScript to play Jevkenpo.</p></noscript>
+  </body>
+</html>
