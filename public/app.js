@@ -63,7 +63,8 @@ function render(animate = false) {
     ui['hero-object'].classList.remove('pop');
     void ui['hero-object'].offsetWidth;
     ui['hero-object'].classList.add('pop');
-    ui.chain.lastElementChild?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    // Follow the newest item inside the history without scrolling the page.
+    ui.chain.scrollTop = ui.chain.scrollHeight;
   }
   setBusy(busy);
 }
