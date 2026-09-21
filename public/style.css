@@ -52,6 +52,8 @@ kbd { font: inherit; color: #777; padding: 2px 4px; border: 1px solid #eeeeee; b
 .feedback.success { color: #52735a; }
 .feedback.error { color: #a25949; }
 .feedback.pending { color: #858585; }
+.win-probability { display: block; margin-top: 5px; color: #777; font-size: 11px; }
+.win-probability strong { color: #424242; font-weight: 600; font-variant-numeric: tabular-nums; }
 .retry-connection { border: 0; background: none; text-decoration: underline; color: #555; font-size: 12px; padding: 8px; }
 .journey { margin-top: 23px; border-top: 1px solid #efefef; padding-top: 22px; }
 .journey-heading { display: flex; align-items: center; justify-content: space-between; color: #919191; font-size: 9px; letter-spacing: 1.4px; }

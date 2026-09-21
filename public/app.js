@@ -99,6 +99,17 @@ function describeResult(result) {
   if (result.verdict === 'lose') feedback(`Jev says ${result.guess} doesn’t beat ${result.against}.`, 'error');
   if (result.verdict === 'repeat') feedback('Already in your chain. Think of something new.', 'error');
   if (result.verdict === 'invalid') feedback('Name a thing or an idea. Let Jev do the judging.', 'error');
+  const probability = result.winProbability;
+  if (Number.isFinite(probability) && probability >= 0 && probability <= 1) {
+    const chance = document.createElement('span');
+    chance.className = 'win-probability';
+    const value = document.createElement('strong');
+    value.textContent = probability > 0 && probability < 0.001 ? '<0.1%'
+      : probability < 1 && probability > 0.999 ? '>99.9%'
+      : new Intl.NumberFormat('en-US', { style: 'percent', maximumFractionDigits: 1 }).format(probability);
+    chance.append('Jev’s win probability: ', value);
+    ui.feedback.append(chance);
+  }
 }
 
 async function connect() {

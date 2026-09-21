@@ -18,17 +18,19 @@ function client(handler) {
     return { status: response.status, data: result };
   };
 }
-const win = async () => ({ verdict: 'win', emoji: '🔥' });
+const win = async () => ({ verdict: 'win', emoji: '🔥', winProbability: 0.91 });
 
 test('a signed run survives independent Vercel instances and cannot be forged', async () => {
   const a = client(createCloudHandler({ secret, judge: win }));
   await a('game');
   const played = await a('guess', { guess: 'fire' });
   assert.equal(played.data.score, 1);
+  assert.equal(played.data.result.winProbability, 0.91);
   const b = client(createCloudHandler({ secret, judge: win }));
   const resumed = await b('game', { token: played.data.token });
   assert.equal(resumed.data.history.at(-1).name, 'fire');
   assert.equal(resumed.data.score, 1);
+  assert.equal(resumed.data.last.winProbability, 0.91);
   const next = await b('guess', { guess: 'water' });
   assert.equal(next.data.score, 2);
   const broken = played.data.token.slice(0, -4) + 'AAAA';

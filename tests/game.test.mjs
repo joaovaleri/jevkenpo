@@ -46,11 +46,28 @@ test('emoji selection works locally in both languages, with an honest fallback',
   assert.equal(emojiFor('a completely new unnamed phenomenon'), '✨');
 });
 
+test('win probability comes from the win option even on losses, never from confidence', () => {
+  for (const win of [0, 0.27, 1]) {
+    const result = parseAnswer({ answers: { verdict: {
+      type: 'choice', choice: win === 1 ? 'win' : 'lose', confidence: 0.99,
+      probabilities: { win, lose: 1 - win, repeat: 0, invalid: 0 },
+    } } }, 'rock');
+    assert.equal(result.winProbability, win);
+  }
+  for (const win of [undefined, null, '0.7', -0.1, 1.1, NaN, Infinity]) {
+    const result = parseAnswer({ answers: { verdict: {
+      type: 'choice', choice: 'win', confidence: 1, probabilities: { win },
+    } } }, 'fire');
+    assert.equal('winProbability' in result, false);
+    assert.equal(result.verdict, 'win');
+  }
+});
+
 test('cache reuses judgments but keeps chain-dependent repeat checks separate', async () => {
   let calls = 0;
   const judge = cacheJudge(async (_, guess, history) => {
     calls++;
-    return { verdict: history.some(item => item.name === guess) ? 'repeat' : 'win', emoji: '🔥' };
+    return { verdict: history.some(item => item.name === guess) ? 'repeat' : 'win', emoji: '🔥', winProbability: 0.73 };
   });
   const current = { name: 'paper' };
   const history = [current];
@@ -58,6 +75,8 @@ test('cache reuses judgments but keeps chain-dependent repeat checks separate', 
   assert.equal(calls, 1);
   one.verdict = 'lose';
   assert.equal(two.verdict, 'win');
+  assert.equal(two.winProbability, 0.73);
+  assert.equal((await judge(current, 'fire', history)).winProbability, 0.73);
   assert.equal((await judge(current, 'fire', history)).verdict, 'win');
   assert.equal(calls, 1);
   assert.equal((await judge(current, 'fire', [{ name: 'fire' }, current])).verdict, 'repeat');

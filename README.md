@@ -49,6 +49,10 @@ that Jev is not connected; no fake or hard-coded judgments are substituted.
 - One request asks Jev only for the verdict. A local English/Portuguese dictionary
   selects a representative emoji, falling back to ✨ for unknown concepts.
   Jev does not generate prose; result messages are interface text.
+- Results show Jev's win probability from `answers.verdict.probabilities.win`,
+  including on losses. It uses the existing response, with no additional API call.
+  This is the model's estimate for the matchup. Older saves or results without
+  a valid probability omit the percentage.
 - A shared in-memory cache reuses identical judgments for 24 hours, up to 10,000
   entries. It includes the full chain, current target and exact answer, so a cached
   win cannot bypass semantic-repeat detection in another chain. Concurrent identical
