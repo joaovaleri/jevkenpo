@@ -2,7 +2,10 @@
 
 **Rock, paper, scissors. And literally anything else.**
 
-[Play Jevkenpo](https://jevkenpo.vercel.app) · [Source](https://github.com/joaovaleri/jevkenpo)
+[Source](https://github.com/joaovaleri/jevkenpo)
+
+The hosted demo is currently offline. [Run locally](#run) or
+[deploy your own version](#deploy-on-vercel) to play.
 
 A deliberately minimal browser game. Start with paper, name anything that beats it,
 and let TypeSafe's Jev judge. Every accepted answer becomes the next challenge.
