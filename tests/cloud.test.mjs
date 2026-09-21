@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createCloudHandler, createRunSigner } from '../lib/cloud-game.mjs';
+import { JevBudgetError } from '../lib/judge.mjs';
 
 const secret = 'test-only-signing-key-never-a-production-credential';
 function client(handler) {
@@ -102,4 +103,29 @@ test('cloud burst limit is per client within an instance', async () => {
   for (let i = 0; i < 60; i++) assert.equal((await play('game')).status, 200);
   assert.equal((await play('game')).status, 429);
   assert.equal((await play('game', undefined, { headers: { 'x-real-ip': '192.0.2.2' } })).status, 200);
+});
+
+test('cloud budget exhaustion preserves the save and cached matches remain free', async () => {
+  let exhausted = false;
+  let calls = 0;
+  const handler = createCloudHandler({ secret, judge: async () => {
+    calls++;
+    if (exhausted) throw new JevBudgetError();
+    return win();
+  } });
+  const a = client(handler);
+  await a('game');
+  const saved = await a('guess', { guess: 'fire' });
+  exhausted = true;
+  const failed = await a('guess', { guess: 'water' });
+  assert.equal(failed.status, 402);
+  assert.equal(failed.data.code, 'budget_exhausted');
+  assert.match(failed.data.error, /spending limit/);
+  const intact = await a('game', {});
+  assert.equal(intact.data.revision, saved.data.revision);
+  assert.equal(intact.data.score, 1);
+  const b = client(handler);
+  await b('game');
+  assert.equal((await b('guess', { guess: 'fire' })).data.score, 1);
+  assert.equal(calls, 2);
 });

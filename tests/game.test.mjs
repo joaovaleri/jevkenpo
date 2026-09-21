@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createGameServer } from '../server.mjs';
-import { makeRequest, parseAnswer, validateGuess, normalize, askJev, emojiFor } from '../lib/judge.mjs';
+import { makeRequest, parseAnswer, validateGuess, normalize, askJev, emojiFor, JevBudgetError } from '../lib/judge.mjs';
 import { cacheJudge } from '../lib/judge-cache.mjs';
 
 async function fixture(t, options = {}) {
@@ -210,4 +210,16 @@ test('upstream authentication is only sent to TypeSafe, and malformed responses 
   assert.equal(sent.url, 'https://api.typesafe.ai/v1/systemone');
   assert.equal(sent.options.headers.Authorization, 'Bearer test-server-key');
   assert.ok(!sent.options.body.includes('test-server-key'));
+});
+
+test('local budget exhaustion is explicit and preserves the run', async t => {
+  const { request } = await fixture(t, { judge: async () => { throw new JevBudgetError(); } });
+  const start = await request('/api/game');
+  const failed = await request('/api/guess', { guess: 'fire' });
+  assert.equal(failed.status, 402);
+  assert.equal(failed.data.code, 'budget_exhausted');
+  assert.match(failed.data.error, /spending limit/);
+  const intact = await request('/api/game');
+  assert.equal(intact.data.revision, start.data.revision);
+  assert.equal(intact.data.score, 0);
 });

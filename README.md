@@ -2,10 +2,7 @@
 
 **Rock, paper, scissors. And literally anything else.**
 
-[Source](https://github.com/joaovaleri/jevkenpo)
-
-The hosted demo is currently offline. [Run locally](#run) or
-[deploy your own version](#deploy-on-vercel) to play.
+[Play](https://jevkenpo.vercel.app/) · [Source](https://github.com/joaovaleri/jevkenpo)
 
 A deliberately minimal browser game. Start with paper, name anything that beats it,
 and let TypeSafe's Jev judge. Every accepted answer becomes the next challenge.
@@ -21,10 +18,33 @@ Node.js API, and no runtime packages or database.
 2. Set the server environment variable `TYPESAFE_API_KEY`.
 3. Deploy. The included `vercel.json` configures the static page and API function.
 
+### OpenRouter with a spending cap
+
+The hosted demo uses Jev through OpenRouter. To use the same setup:
+
+1. Create a dedicated OpenRouter API key and set a **$10 spending limit with no
+   reset**. This is a total API usage cap, not a recurring monthly allowance.
+2. Set `JEV_PROVIDER=openrouter`, `JEV_MODEL=jev-latest`, and the server secret
+   `OPENROUTER_API_KEY` in Vercel (or `.env.local` when running locally).
+3. Deploy again after changing environment variables. The key stays server-side.
+
+OpenRouter enforces the cap across requests and server instances. A local counter
+would not provide this guarantee on Vercel. When OpenRouter reports an exhausted
+key limit or balance, the game shows a spending-limit message and preserves the
+run. Cached results may still work without another paid request. It never falls
+back to the direct TypeSafe key, even if both credentials are configured.
+
+The limit must be configured on the OpenRouter key; setting environment variables
+alone does **not** create a cap. Credit purchases, fees, and hosting are separate.
+This setup uses OpenRouter credits; if you configure BYOK in your OpenRouter
+account, include BYOK usage in the key limit as well. See the official
+[credit limits](https://openrouter.ai/docs/api_reference/limits) and
+[TypeSafe integration](https://openrouter.ai/docs/guides/community/typesafe-sdk).
+
 The Vercel version stores a signed save in the player's browser. Any function
 instance can verify it, so a cold start does not lose the chain. Saves expire after
 24 hours without a judged move. `SESSION_SECRET` is optional; otherwise a dedicated
-signing key is derived from the TypeSafe key. Changing that key expires old saves.
+signing key is derived from the selected provider key. Changing that key expires old saves.
 Neither secret is sent to the browser or committed to the repository.
 
 Vercel's local preview is also available with `npx vercel dev` after setting the
@@ -36,7 +56,7 @@ Node.js 22; no packages to install.
 
 ```sh
 cp .env.example .env.local
-# Set TYPESAFE_API_KEY in .env.local (or use the existing environment variable).
+# Set TYPESAFE_API_KEY, or use the OpenRouter configuration above.
 npm start
 ```
 
@@ -91,7 +111,10 @@ repeat handling, stale/concurrent requests, error recovery, and server-only cred
 
 Uses the [TypeSafe System One API](https://docs.typesafe.ai/introduction), with
 one [Choice question](https://docs.typesafe.ai/primitives/choice) per uncached guess.
-Default model: `jev-1.13.0`, configurable through `JEV_MODEL`.
+The direct TypeSafe default is `jev-1.13.0`. OpenRouter defaults to `jev-latest`
+through its compatible `/api/v1/systemone` endpoint, with the same verdict and
+probabilities. `JEV_MODEL` overrides the default. The latest alias follows new
+Jev releases, so model behavior and pricing may change over time.
 
 ## Measured API cost
 
@@ -123,8 +146,9 @@ See the [official model price](https://docs.typesafe.ai/models).
 
 Vercel handles HTTPS. The API has a 60-request/minute/IP burst guard per warm
 function instance. The cache is also per warm instance and can be cleared on cold
-starts. Neither is a global quota; use Vercel Firewall and provider spend controls
-for stronger abuse protection. API requests still incur the TypeSafe usage charge.
+starts. Neither is a global quota; configure a provider spending cap as described
+above and use Vercel Firewall for stronger abuse protection. Uncached guesses
+incur usage charges at the selected provider.
 
 Signed saves prevent forging accepted moves, but without a database a player can
 replay an older valid save or fork a run between tabs. Scores are personal, not an

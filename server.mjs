@@ -2,7 +2,7 @@ import http from 'node:http';
 import { randomBytes } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-import { askJev, normalize, validateGuess } from './lib/judge.mjs';
+import { askJev, normalize, validateGuess, jevConfig, JevBudgetError } from './lib/judge.mjs';
 import { cacheJudge } from './lib/judge-cache.mjs';
 
 const PUBLIC = new URL('./public/', import.meta.url);
@@ -21,10 +21,12 @@ const BASE_HEADERS = {
 };
 const initialRun = () => ({ history: [{ name: 'paper', emoji: '📄' }], over: false, busy: false, last: null, revision: randomBytes(12).toString('hex') });
 
-export function createGameServer({ key = process.env.TYPESAFE_API_KEY, model = process.env.JEV_MODEL || 'jev-1.13.0', judge, now = Date.now } = {}) {
+export function createGameServer({ key, model, provider, judge, now = Date.now } = {}) {
+  const config = jevConfig({ key, model, provider });
+  key = config.key;
   const sessions = new Map();
   const limits = new Map();
-  const evaluate = cacheJudge(judge || ((current, guess, history) => askJev(current, guess, history, { key, model })), { now });
+  const evaluate = cacheJudge(judge || ((current, guess, history) => askJev(current, guess, history, config)), { now });
   const available = Boolean(key || judge);
   const snapshot = session => ({
     history: session.run.history, score: session.run.history.length - 1,
@@ -89,7 +91,7 @@ export function createGameServer({ key = process.env.TYPESAFE_API_KEY, model = p
         session.run = initialRun();
         return send(200, snapshot(session));
       }
-      if (!available) return send(503, { error: 'Jev is not connected yet. Add TYPESAFE_API_KEY on the server to play.' });
+      if (!available) return send(503, { error: 'Jev is not connected yet. Add the API key on the server to play.' });
       if (session.run.over) return send(409, { error: 'Start a new run to play again.', game: snapshot(session) });
       let guess;
       try { guess = validateGuess(body.guess); } catch (error) { return send(400, { error: error.message }); }
@@ -109,6 +111,7 @@ export function createGameServer({ key = process.env.TYPESAFE_API_KEY, model = p
         session.run.revision = randomBytes(12).toString('hex');
         return send(200, { ...snapshot(session), result: session.run.last });
       } catch (error) {
+        if (error instanceof JevBudgetError) return send(402, { error: error.message, code: 'budget_exhausted' });
         const message = error?.name === 'TimeoutError' ? 'Jev took too long. Your run is safe. Try again.' : 'Jev could not judge that right now. Your run is safe. Try again.';
         return send(502, { error: message });
       } finally { session.run.busy = false; }
@@ -124,6 +127,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const host = process.env.HOST || '127.0.0.1';
   createGameServer().listen(port, host, () => {
     console.log(`Jevkenpo is ready at http://${host}:${port}`);
-    console.log(`Jev: ${process.env.TYPESAFE_API_KEY ? 'connected' : 'missing TYPESAFE_API_KEY'}`);
+    console.log(`Jev (${jevConfig().provider}): ${jevConfig().key ? 'connected' : 'missing API key'}`);
   });
 }
